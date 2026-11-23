@@ -1,0 +1,140 @@
+﻿@page "/"
+
+<PageTitle>Date range presets</PageTitle>
+
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-copy">
+            <span class="badge">A calmer way to filter</span>
+            <h1>Find the right <span>range</span>, then apply it.</h1>
+            <p class="intro">
+                DateRangePresets keeps selection lightweight and queries intentional. Pick a shortcut or shape a custom range without changing the results too soon.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="#date-range">Choose a range <span aria-hidden="true">→</span></a>
+                <a class="btn btn-ghost" href="#principles">See the details</a>
+            </div>
+        </div>
+        <div class="overview-card">
+            <div class="overview-heading">
+                <div>
+                    <p class="card-kicker">Current workspace</p>
+                    <h2>Timesheet history</h2>
+                </div>
+                <span class="live-dot" aria-label="Ready"></span>
+            </div>
+            <p class="muted">Ready for a new date range</p>
+            <div class="stat-row">
+                <div class="stat"><strong>@_entries.Count</strong><span>entries</span></div>
+                <div class="stat"><strong>@_entries.Sum(entry => entry.Hours).ToString("0.0")</strong><span>hours</span></div>
+                <div class="stat"><strong>2</strong><span>statuses</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="workspace" id="date-range" aria-labelledby="picker-heading">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">The workflow</p>
+            <h2 id="picker-heading">Select your date range</h2>
+        </div>
+        <p>Shortcuts update the draft. Apply is the moment your parent query runs.</p>
+    </div>
+    <div class="picker-shell">
+        <DateRangePresets Label="Date range" Today="@_today" OnApply="ApplyRange" />
+    </div>
+</section>
+
+<section class="history block" id="history" aria-labelledby="history-heading">
+    <div class="history-heading">
+        <div>
+            <p class="eyebrow">Activity</p>
+            <h2 id="history-heading">Timesheet history</h2>
+        </div>
+        <p class="selection">@_selection</p>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Hours</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in _visibleEntries)
+                {
+                    <tr>
+                        <td>@entry.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@entry.Project</td>
+                        <td>@entry.Hours.ToString("0.0")</td>
+                        <td><span class="status @entry.Status.ToLowerInvariant()">@entry.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="principles block" id="principles" aria-labelledby="principles-heading">
+    <div class="section-head">
+        <p class="eyebrow">Built for real filters</p>
+        <h2 id="principles-heading">Small controls. Clear intent.</h2>
+        <p>The component stays focused on selection while the parent remains in charge of data, loading, and errors.</p>
+    </div>
+    <div class="principle-grid">
+        <article class="principle blue">
+            <span class="principle-icon" aria-hidden="true">↗</span>
+            <h3>Draft by default</h3>
+            <p>Changing a shortcut or date never refreshes the history prematurely.</p>
+        </article>
+        <article class="principle teal">
+            <span class="principle-icon" aria-hidden="true">◷</span>
+            <h3>Inclusive dates</h3>
+            <p>Every range includes both endpoints, including month-to-date boundaries.</p>
+        </article>
+        <article class="principle amber">
+            <span class="principle-icon" aria-hidden="true">✓</span>
+            <h3>Explicit apply</h3>
+            <p>One deliberate action tells the parent when it is time to query.</p>
+        </article>
+    </div>
+</section>
+
+@code {
+    private readonly DateOnly _today = new(2026, 11, 23);
+    private readonly List<TimesheetEntry> _entries =
+    [
+        new(new DateOnly(2026, 11, 23), "DateRangePresets", 6.5, "Draft"),
+        new(new DateOnly(2026, 11, 20), "Release planning", 7.0, "Approved"),
+        new(new DateOnly(2026, 11, 18), "Audit dashboard", 5.5, "Approved"),
+        new(new DateOnly(2026, 11, 12), "DateRangePresets", 8.0, "Approved"),
+        new(new DateOnly(2026, 10, 30), "Release planning", 6.0, "Approved")
+    ];
+
+    private IEnumerable<TimesheetEntry> _visibleEntries = [];
+    private string _selection = "Showing all recent entries.";
+
+    protected override void OnInitialized()
+    {
+        _visibleEntries = _entries;
+    }
+
+    private void ApplyRange(DateRangePresets.Range range)
+    {
+        _visibleEntries = _entries
+            .Where(entry => entry.Date >= range.From && entry.Date <= range.Through)
+            .ToList();
+        _selection = $"{range.From:yyyy-MM-dd} through {range.Through:yyyy-MM-dd}";
+    }
+
+    private sealed record TimesheetEntry(
+        DateOnly Date,
+        string Project,
+        double Hours,
+        string Status);
+}

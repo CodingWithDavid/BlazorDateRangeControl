@@ -1,0 +1,22 @@
+﻿@inherits LayoutComponentBase
+<div class="app-shell">
+    <header class="site-header">
+        <div class="site-nav">
+            <NavMenu />
+            <a class="header-action" href="#date-range">Try the picker <span aria-hidden="true">→</span></a>
+        </div>
+    </header>
+
+    <main>
+        <article class="content">
+            @Body
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <span class="brand-mark small" aria-hidden="true"></span>
+        <span>DateRangePresets</span>
+        <span class="footer-divider" aria-hidden="true">·</span>
+        <span>Draft first. Apply when ready.</span>
+    </footer>
+</div>

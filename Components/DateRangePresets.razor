@@ -1,0 +1,84 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<fieldset class="date-range">
+    <legend>@Label</legend>
+
+    <div class="presets">
+        <button type="button" @onclick="ChooseToday">Today</button>
+        <button type="button" @onclick="ChooseWeek">Last 7 days</button>
+        <button type="button" @onclick="ChooseMonth">This month</button>
+    </div>
+
+    <div class="dates">
+        <label>
+            From
+            <input type="date" @bind="_from" />
+        </label>
+
+        <label>
+            Through
+            <input type="date" @bind="_through" />
+        </label>
+
+        <button type="button" @onclick="ApplyAsync">Apply</button>
+    </div>
+
+    <p role="status">@_message</p>
+</fieldset>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Date range";
+    [Parameter, EditorRequired] public DateOnly Today { get; set; }
+    [Parameter] public EventCallback<Range> OnApply { get; set; }
+
+    private DateOnly? _from;
+    private DateOnly? _through;
+    private bool _initialized;
+    private string _message = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _from = Today;
+        _through = Today;
+        _initialized = true;
+    }
+
+    private void SetRange(DateOnly from, DateOnly through)
+    {
+        _from = from;
+        _through = through;
+        _message = "Dates selected. Choose Apply to update results.";
+    }
+
+    private void ChooseToday() => SetRange(Today, Today);
+
+    private void ChooseWeek() => SetRange(Today.AddDays(-6), Today);
+
+    private void ChooseMonth() => SetRange(new DateOnly(Today.Year, Today.Month, 1), Today);
+
+    private async Task ApplyAsync()
+    {
+        if (_from is null || _through is null)
+        {
+            _message = "Enter both dates.";
+            return;
+        }
+
+        if (_from > _through)
+        {
+            _message = "From must be on or before Through.";
+            return;
+        }
+
+        await OnApply.InvokeAsync(new Range(_from.Value, _through.Value));
+        _message = "Date range applied.";
+    }
+
+    public sealed record Range(DateOnly From, DateOnly Through);
+}

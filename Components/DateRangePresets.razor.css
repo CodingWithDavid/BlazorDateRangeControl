@@ -1,0 +1,92 @@
+.date-range {
+    max-inline-size: 44rem;
+    min-inline-size: 0;
+    padding: 1rem;
+    border: 1px solid #dbe3ef;
+    border-radius: var(--radius);
+    color: var(--charcoal-text);
+    background: var(--white);
+}
+
+legend {
+    padding-inline: .4rem;
+    color: var(--deep-navy);
+    font-weight: 700;
+}
+
+.presets,
+.dates {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .65rem;
+}
+
+.presets {
+    margin-block-end: 1rem;
+}
+
+label {
+    display: grid;
+    gap: .3rem;
+    font-weight: 600;
+}
+
+input,
+button {
+    box-sizing: border-box;
+    min-block-size: 2.75rem;
+    max-inline-size: 100%;
+    padding: .5rem .75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: .4rem;
+    font: inherit;
+}
+
+button {
+    background: var(--soft-sky);
+    color: var(--professional-blue);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s ease, box-shadow .15s ease, transform .12s ease;
+}
+
+button:hover {
+    background: #d6e5ff;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+.dates button {
+    background: var(--teal-accent);
+    color: var(--white);
+}
+
+.dates button:hover {
+    background: var(--teal-accent-hover);
+    box-shadow: 0 6px 16px rgba(20, 184, 166, .25);
+}
+
+input:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--professional-blue);
+    outline-offset: 2px;
+}
+
+p {
+    min-block-size: 1.5em;
+    margin-block-end: 0;
+    color: var(--muted-text);
+}
+
+@media (max-width: 30rem) {
+    .dates {
+        align-items: stretch;
+    }
+
+    .dates label {
+        flex: 1 1 100%;
+    }
+}
